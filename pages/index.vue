@@ -27,7 +27,7 @@ export default {
 
     try {
       console.log("this", this)
-      const {data} = await this.$api.giveweaways();
+      const {data} = await this.$api.giveaways();
       console.log("data", data)
       this.giveaways = data.filter(giveaway => giveaway.title);
     } catch (error) {

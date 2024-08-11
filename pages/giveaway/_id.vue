@@ -45,7 +45,7 @@ import axios from 'axios';
 export default {
   async fetch(){
     console.log("params", this.$route.params)
-    const {data} = await this.$axios.giveweaway(this.$route.params.id);
+    const {data} = await this.$axios.giveaway(this.$route.params.id);
     this.giveaway = data
     console.log("fetch ", data)
     console.log("fetch 2",  this.giveaway)
