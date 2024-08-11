@@ -1,7 +1,7 @@
 import colors from 'vuetify/es5/util/colors'
 
 export default {
-  ssr:false,
+  // ssr:false,
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'tg_app',
@@ -65,8 +65,12 @@ export default {
           warning: colors.amber.base,
           error: colors.deepOrange.accent4,
           success: colors.green.accent3
+
         }
       }
+    },
+    icons: {
+      iconfont: 'mdi' // default - only for display purposes
     }
   },
 

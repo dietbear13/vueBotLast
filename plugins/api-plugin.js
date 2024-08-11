@@ -7,5 +7,5 @@ export default (ctx, inject) => {
   // -> this.$api in store actions/mutations
   // ctx.app.$axios.defaults.timeout = 30000
   console.log("ctx",ctx)
-  inject('api', api(ctx.$axios))
+  inject('api', api(ctx.app.$axios))
 }

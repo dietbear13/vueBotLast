@@ -19,7 +19,16 @@ export default {
 			console.log(this.giveaway)
 	},
 	methods:{
-		viewGiveaway(id) {
+    async fetch() {
+      try {
+        const { data } = await this.$axios.get(`/api/giveaways/${this.$route.params.id}`);
+        this.giveaway = data;
+      } catch (error) {
+        console.error("Ошибка при загрузке данных розыгрыша:", error);
+      }
+    },
+
+    viewGiveaway(id) {
             this.$router.push({ name: "giveaway-id", params: { id } });
         }
 	}

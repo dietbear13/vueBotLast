@@ -21,7 +21,7 @@ export default {
       giveaways: [],
     };
   },
-  // fetchOnServer: false,
+  // fetchOnServer: true,
   async fetch() {
 
 
@@ -66,14 +66,5 @@ export default {
 </script>
 
 <style scoped>
-.custom-btn {
-  width: 150px;
-  background-color: #1976d2;
-  color: white;
-  transition: background-color 0.3s;
-}
 
-.custom-btn:hover {
-  background-color: #1565c0;
-}
 </style>

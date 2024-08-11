@@ -45,10 +45,9 @@ import axios from 'axios';
 export default {
   async fetch(){
     console.log("params", this.$route.params)
-    const {data} = await this.$axios.giveaway(this.$route.params.id);
+    const {data} = await this.$api.giveaway(this.$route.params.id);
     this.giveaway = data
-    console.log("fetch ", data)
-    console.log("fetch 2",  this.giveaway)
+    console.log("fetchh ", data)
   },
   mounted(){
 
@@ -62,6 +61,15 @@ export default {
     };
   },
   methods: {
+    async fetch() {
+      try {
+        const { data } = await this.$axios.get(`/api/giveaways/${this.$route.params.id}`);
+        this.giveaway = data;
+      } catch (error) {
+        console.error("Ошибка при загрузке данных розыгрыша:", error);
+      }
+    },
+
     openChannel(link) {
       window.open(link, '_blank');
     },
@@ -97,33 +105,4 @@ export default {
 </script>
 
 <style scoped>
-.clickable-card {
-  cursor: pointer;
-  transition: box-shadow 0.3s;
-}
-
-.clickable-card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.channel-name {
-  font-weight: bold;
-  color: #1976d2;
-  transition: color 0.3s;
-}
-
-.clickable-card:hover .channel-name {
-  color: #1565c0;
-}
-
-.custom-btn {
-  width: 150px;
-  background-color: #1976d2;
-  color: white;
-  transition: background-color 0.3s;
-}
-
-.custom-btn:hover {
-  background-color: #1565c0;
-}
 </style>
