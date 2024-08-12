@@ -70,6 +70,6 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 /* Ваши стили */
 </style>
