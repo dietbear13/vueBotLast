@@ -1,34 +1,65 @@
 // Определение переменных
 $font-family: 'Roboto', sans-serif;
 $font-size-base: 16px;
+
 $primary-color: #1E88E5;
-$secondary-color: #FFC107;
-$accent-color: #424242;
-$info-color: #00ACC1;
-$warning-color: #FFB300;
-$error-color: #D32F2F;
-$success-color: #43A047;
+$secondary-color: #B0BEC5;
+$accent-color: #FFA726;
+
+$background-color: #121212;
+$text-color: #FFFFFF;
+$button-color: $accent-color;
 
 $padding-base: 16px;
-$border-radius: 8px;
+$border-radius: 12px;
+
+$card-background-color: #1E1E1E;
+$card-shadow-color: rgba(0, 0, 0, 0.7);
 
 // Общие стили для компонентов
 body {
   font-family: $font-family;
   font-size: $font-size-base;
-  background-color: #121212; // Основной цвет фона
-  color: #ffffff; // Основной цвет текста
+  background-color: $background-color; // Основной цвет фона
+  color: $text-color; // Основной цвет текста
 }
 
 .btn-primary {
-  background-color: $primary-color;
-  color: #ffffff;
+  background-color: $button-color;
+  color: $text-color;
   border-radius: $border-radius;
+  padding: $padding-base;
+  font-weight: bold;
+  box-shadow: 0 2px 10px $card-shadow-color;
+  transition: background-color 0.3s ease;
+  &:hover {
+    background-color: darken($button-color, 10%);
+  }
 }
 
 .card {
-  background-color: #1e1e1e; // Тёмный фон для карточек
+  background-color: $card-background-color;
   border-radius: $border-radius;
   padding: $padding-base;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 15px $card-shadow-color;
+}
+
+.bottom-menu {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+}
+
+.bottom-menu button {
+  background: none;
+  border: none;
+}
+
+.bottom-menu img {
+  width: 30px;
+  height: 30px;
 }

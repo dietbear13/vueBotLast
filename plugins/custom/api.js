@@ -7,8 +7,10 @@ export default (axios) => {
     },
     giveaway:(id)=>{
       return axios.get(`http://localhost:3001/api/giveaways/${id}`);
-    }
-
+    },
+    sportsEvents: () => {
+      return axios.get("http://localhost:3001/api/sports-events");
+    },
 
   }
 

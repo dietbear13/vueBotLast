@@ -1,7 +1,9 @@
 import colors from 'vuetify/es5/util/colors'
 
 export default {
-  // ssr:false,
+  ssr: false,
+  headers: {'Access-Control-Allow-Origin':'*'},
+
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'tg_app',
@@ -37,6 +39,17 @@ export default {
     { src: '~/plugins/vue-telegram.js', mode: 'client' }
 
   ],
+  router: {
+    extendRoutes(routes, resolve) {
+      routes.push({
+        name: 'betting',
+        path: '/betting',
+        component: resolve(__dirname, 'pages/betting.vue')
+      });
+
+      console.log(routes);
+    }
+  },
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -70,7 +83,6 @@ export default {
       }
     },
     icons: {
-      iconfont: 'mdi' // default - only for display purposes
     }
   },
 
