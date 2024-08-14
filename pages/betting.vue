@@ -1,11 +1,6 @@
 <template>
   <v-container>
-    <v-card-title>
-      <h1 class="text-center">Ставки</h1>
-    </v-card-title>
-
-    <v-divider class="my-4"></v-divider>
-
+    <PageHeader title="Ставки" />
     <v-row>
       <v-col v-for="event in events" :key="event._id" cols="12" md="6">
         <EventItem :event="event" />
@@ -16,16 +11,24 @@
 </template>
 
 <script>
+import PageHeader from '@/components/PageHeader.vue';
 import EventItem from "../components/EventItem.vue";
 import FooterMenu from '../components/FooterMenu.vue';
 
 export default {
+  components: {
+    PageHeader,
+    EventItem,
+    FooterMenu
+  },
   data() {
     return {
-      events: [],
+      events: []
     };
   },
-
+  mounted() {
+    this.fetchEvents();
+  },
   methods: {
     async fetchEvents() {
       try {
@@ -35,15 +38,6 @@ export default {
         console.error("Ошибка загрузки данных о спортивных событиях", error);
       }
     }
-  },
-
-  mounted() {
-    this.fetchEvents(); // Убедитесь, что метод вызывается правильно.
-  },
-
-  components: {
-    EventItem,
-    FooterMenu,
-  },
-};
+  }
+}
 </script>

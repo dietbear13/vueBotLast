@@ -28,12 +28,6 @@ export default {
     ]
   },
 
-  // Global CSS: https://go.nuxtjs.dev/config-css
-  css: [
-    'C:\\Users\\dietb\\VSprojects\\testy\\test\\assets\\neon-theme.scss' // Добавьте ваш новый файл стилей здесь
-
-  ],
-
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     { src: '~/plugins/axios.js',mode: 'all' },
@@ -68,24 +62,44 @@ export default {
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
+    // customVariables: ['~/assets/neon-theme.scss'],
     theme: {
-      dark: true,
+      dark: true, // или true, если хотите темную тему
       themes: {
         dark: {
-          primary: '#1E88E5',
-          accent: '#FFA726',
-          secondary: '#B0BEC5',
-          info: '#00e5ff',
-          warning: '#ff6ec7',
-          error: '#ff4081',
-          success: '#69f0ae'
+          primary: '#FF6EC7',   // Яркий неоново-зеленый
+          secondary: '#FF6EC7', // Неоново-розовый
+          accent: '#00FFFF',    // Неоново-голубой (циан)
+          error: '#FF1744',     // Яркий красный для ошибок
+          warning: '#FFEA00',   // Неоново-желтый
+          info: '#00E5FF',      // Неоново-голубой для информационных сообщений
+          success: '#76FF03',   // Яркий неоново-зеленый для успеха
+          background: '#121212' // Темный фон
+        },
+        light: {
+          primary: '#FF6EC7',   // Яркий неоново-зеленый
+          secondary: '#FF6EC7', // Неоново-розовый
+          accent: '#00FFFF',    // Неоново-голубой (циан)
+          error: '#FF1744',     // Яркий красный для ошибок
+          warning: '#FFEA00',   // Неоново-желтый
+          info: '#00E5FF',      // Неоново-голубой для информационных сообщений
+          success: '#76FF03',   // Яркий неоново-зеленый для успеха
+          background: '#000000' // Черный фон для светлой темы (контраст неоновых цветов)
         }
       }
     }
   },
 
+  // Global CSS: https://go.nuxtjs.dev/config-css
+  css: [
+    '~/assets/neon-theme.scss'
+  ],
+
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: [({ isLegacy }) => isLegacy && 'axios']
+    transpile: [
+      ({ isLegacy }) => isLegacy && 'axios',
+      '@telegram-apps/sdk'
+    ]
   }
 }

@@ -1,8 +1,6 @@
 <template>
   <v-container>
-    <v-card-title>
-      <h1 class="text-center">Ставки</h1>
-    </v-card-title>
+    <PageHeader title="Ставки" />
 
     <v-divider class="my-4"></v-divider>
 
@@ -18,11 +16,12 @@
 <script>
 import EventItem from "../components/EventItem.vue";
 import FooterMenu from '../components/FooterMenu.vue';
-
+import PageHeader from '../components/PageHeader.vue';
 export default {
   data() {
     return {
       events: [],
+      betOptions: [10, 50, 100, 500, 1000]
     };
   },
 
@@ -38,12 +37,37 @@ export default {
       } catch (error) {
         console.error("Ошибка загрузки данных о спортивных событиях", error);
       }
+    },
+    placeBet(amount) {
+      console.log(`Поставить ${amount}`);
+      // Реализация ставки
     }
   },
 
   components: {
     EventItem,
     FooterMenu,
+    PageHeader
   },
 };
 </script>
+
+<style scoped>
+.betting-container {
+  display: flex;
+  justify-content: space-around;
+  padding: 20px;
+}
+
+.bet-button {
+  font-size: 1.25rem;
+  color: #000;
+  background-color: #FF6EC7;
+  margin: 5px;
+  transition: transform 0.2s ease;
+}
+
+.bet-button:active {
+  transform: scale(1.1);
+}
+</style>

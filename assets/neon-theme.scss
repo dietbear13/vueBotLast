@@ -1,85 +1,189 @@
-// Определение переменных
-$font-family: 'Roboto', sans-serif;
-$font-size-base: 16px;
+// Основные цвета
+$neon-pink: #FF6EC7;
+$neon-blue: #00FFFF;
+$background-dark: #121212;
+$background-light: #1e1e1e;
+$text-color: #e0e0e0; // Нейтральный цвет для основного текста
 
-$primary-color: #1E88E5;
-$secondary-color: #B0BEC5;
-$accent-color: #FFA726;
+// Градиенты для фонов
+$gradient-pink-blue: linear-gradient(45deg, $neon-pink, $neon-blue);
 
-$background-color: #121212;
-$text-color: #FFFFFF;
-$button-color: $accent-color;
-
-$padding-base: 16px;
-$border-radius: 12px;
-
-$card-background-color: #1E1E1E;
-$card-shadow-color: rgba(0, 0, 0, 0.7);
-
-// Неоновые цвета
-$neon-primary: #00e5ff;
-$neon-accent: #ff6ec7;
-$neon-secondary: #ff4081;
-$neon-glow: rgba(0, 229, 255, 0.7);
-
-// Общие стили для компонентов
+// Базовые стили для фона и текста
 body {
-  font-family: $font-family;
-  font-size: $font-size-base;
-  background-color: $background-color; // Основной цвет фона
-  color: $text-color; // Основной цвет текста
-}
-
-// Кнопки с неоновым эффектом
-.btn-primary {
-  background-color: $neon-accent;
+  background-color: $background-dark;
   color: $text-color;
-  border-radius: $border-radius;
-  padding: $padding-base;
-  font-weight: bold;
-  box-shadow: 0 0 10px $neon-glow, 0 0 20px $neon-glow, 0 0 30px $neon-accent;
+  font-family: 'Roboto', sans-serif;
+}
+
+// Контейнеры с градиентными фонами
+.v-card, .v-container {
+  background: $gradient-pink-blue;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba($neon-pink, 0.5), 0 0 10px rgba($neon-blue, 0.5);
+  margin-bottom: 20px;
+}
+
+// Заголовки с неоновым эффектом
+h1, h2, h3 {
+  color: $neon-pink;
+  text-shadow:
+    0 0 5px rgba($neon-pink, 0.8),
+    0 0 10px rgba($neon-pink, 0.6);
+}
+
+// Текст внутри блоков
+.v-card-text {
+  color: $text-color; // Обычный текст внутри блоков, без неонового эффекта
+}
+
+// Кнопки с неоновым свечением
+.v-btn {
+  border: none;
+  background-color: $neon-blue;
+  color: #000;
+  box-shadow:
+    0 0 5px rgba($neon-blue, 0.6),
+    0 0 10px rgba($neon-blue, 0.8);
+  border-radius: 4px;
+  padding: 10px 20px;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
-
-  &:hover {
-    background-color: darken($neon-accent, 10%);
-    box-shadow: 0 0 20px $neon-glow, 0 0 30px $neon-glow, 0 0 40px $neon-accent;
-  }
 }
 
-// Карточки с неоновыми тенями
-.card {
-  background-color: $card-background-color;
-  border-radius: $border-radius;
-  padding: $padding-base;
-  box-shadow: 0 2px 15px $card-shadow-color, 0 0 10px $neon-primary;
+.v-btn:active {
+  background-color: $neon-pink;
+  box-shadow:
+    0 0 10px rgba($neon-pink, 0.8),
+    0 0 20px rgba($neon-pink, 1);
 }
 
-// Нижнее меню с неоновым стилем
-.bottom-menu {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background-color: $neon-secondary;
+// Поля ввода с голубым свечением
+.v-input input {
+  background-color: $background-light;
+  border: 2px solid $neon-blue;
+  color: $text-color;
+  box-shadow:
+    0 0 5px rgba($neon-blue, 0.6),
+    0 0 10px rgba($neon-blue, 0.8);
+  border-radius: 4px;
+  padding: 10px;
+  transition: box-shadow 0.3s ease;
+}
+
+.v-input input:focus {
+  box-shadow:
+    0 0 10px rgba($neon-blue, 0.8),
+    0 0 20px rgba($neon-blue, 1);
+}
+
+// Линк с легким неоновым эффектом
+a {
+  color: $neon-blue;
+  text-decoration: none;
+  transition: text-shadow 0.3s ease;
+}
+
+a:active {
+  text-shadow:
+    0 0 5px rgba($neon-blue, 0.8),
+    0 0 10px rgba($neon-blue, 1);
+}
+
+// Новые стили для элементов карточки событий
+
+.event-card {
+  background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.event-title {
+  font-size: 1.5rem;
+  color: #FFFFFF;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.event-subtitle {
+  font-size: 1rem;
+  color: #b0b0b0;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.odds-container {
   display: flex;
   justify-content: space-around;
-  padding: 10px 0;
-  box-shadow: 0 0 10px $neon-glow;
+  margin: 20px 0;
+  align-items: center;
+}
 
-  button {
-    background: none;
-    border: none;
-    color: $text-color;
-    font-size: 18px;
-    transition: color 0.3s ease;
+.odds-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #2b2b2b;
+  padding: 10px 15px;
+  border-radius: 8px;
+  width: 60px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
 
-    &:hover {
-      color: $neon-primary;
-    }
-  }
+.odds-label {
+  font-size: 0.9rem;
+  color: #FFFFFF;
+  margin-bottom: 5px;
+}
 
-  img {
-    width: 30px;
-    height: 30px;
-    filter: drop-shadow(0 0 5px $neon-primary);
-  }
+.odds-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #00FFFF;
+}
+
+.betting-amounts {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+}
+
+.amount-button {
+  background-color: #3a3a3a;
+  color: #FFFFFF;
+  font-weight: bold;
+  border-radius: 8px;
+  width: 60px;
+  height: 40px;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.amount-button:hover {
+  background-color: #565656;
+}
+
+.amount-button.selected {
+  background-color: $neon-pink;
+  transform: scale(1.1);
+}
+
+.betting-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.bet-button {
+  background-color: $neon-pink;
+  color: #FFFFFF;
+  font-weight: bold;
+  border-radius: 8px;
+  width: 80px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.bet-button:active {
+  transform: scale(1.1);
 }
