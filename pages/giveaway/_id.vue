@@ -32,6 +32,11 @@
                 <template v-if="channel.subscribed">
                   <v-icon color="success" class="check-icon">mdi-check-circle</v-icon>
                 </template>
+                <template v-else>
+                  <v-btn class="custom-btn" elevation="8" color="primary" @click.stop="checkSubscription(channel)">
+                    Подписаться
+                  </v-btn>
+                </template>
               </v-col>
             </v-row>
           </v-card-title>
@@ -97,6 +102,31 @@ export default {
         console.error('Ошибка проверки подписок', error);
       }
     },
+    async checkSubscription(channel) {
+      try {
+        const telegramId = window.Telegram.WebApp.initDataUnsafe.user.id; // Получаем telegramId пользователя
+        const response = await this.$axios.post(`/api/check-subscription`, {
+          telegramId,
+          channelId: channel.id
+        });
+        const isSubscribed = response.data.isMember;
+
+        if (isSubscribed) {
+          this.$set(channel, 'subscribed', true);
+          this.snackbarMessage = 'Вы успешно подписаны на канал';
+          this.snackbarColor = 'green';
+        } else {
+          this.snackbarMessage = 'Вы не подписаны на канал';
+          this.snackbarColor = 'red';
+        }
+        this.snackbar = true;
+      } catch (error) {
+        console.error('Ошибка проверки подписки', error);
+        this.snackbarMessage = 'Ошибка проверки подписки';
+        this.snackbarColor = 'red';
+        this.snackbar = true;
+      }
+    },
     openChannel(link) {
       window.open(link, '_blank');
     },
@@ -141,11 +171,6 @@ export default {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   width: 100%; /* Делаем карточки на 100% ширины */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Добавляем тень */
-}
-
-.channel-card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
 }
 
 .channel-avatar {
