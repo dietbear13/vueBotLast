@@ -5,6 +5,10 @@
     <p v-if="giveaway" class="giveaway-description">
       Здесь находится информация о розыгрыше <span>{{ giveaway.title }}</span>
     </p>
+
+    <!-- Добавленный блок для сообщения о награде -->
+    <p v-if="rewardMessage" class="reward-message">{{ rewardMessage }}</p>
+
     <v-list lines="one" v-if="giveaway">
       <v-list-item v-for="channel in giveaway.channels" :key="channel.id" class="channel-item">
         <v-card
@@ -58,6 +62,7 @@ export default {
   data() {
     return {
       giveaway: null,
+      rewardMessage: '', // Новая переменная для сообщения о награде
       snackbar: false,
       snackbarMessage: '',
       snackbarColor: ''
@@ -92,12 +97,20 @@ export default {
         const userSubscriptions = response.data.channels;
 
         // Обновляем статус подписки для каждого канала
+        let allSubscribed = true;
         this.giveaway.channels.forEach(channel => {
           const subscription = userSubscriptions.find(sub => sub.id === channel.id);
           if (subscription && subscription.subscribed) {
             this.$set(channel, 'subscribed', true);
+          } else {
+            allSubscribed = false;
           }
         });
+
+        // Если пользователь подписан на все каналы, отображаем сообщение о награде
+        if (allSubscribed) {
+          this.rewardMessage = `Выдана награда ${this.giveaway.prize} монет`;
+        }
       } catch (error) {
         console.error('Ошибка проверки подписок', error);
       }
@@ -115,6 +128,9 @@ export default {
           this.$set(channel, 'subscribed', true);
           this.snackbarMessage = 'Вы успешно подписаны на канал';
           this.snackbarColor = 'green';
+
+          // Повторная проверка всех подписок после подписки на канал
+          await this.checkAllSubscriptions();
         } else {
           this.snackbarMessage = 'Вы не подписаны на канал';
           this.snackbarColor = 'red';
@@ -157,6 +173,12 @@ export default {
 .giveaway-description span {
   color: #FF6EC7;
   font-weight: bold;
+}
+
+.reward-message {
+  color: #00FF00;
+  font-weight: bold;
+  margin-top: 20px;
 }
 
 .channel-item {
