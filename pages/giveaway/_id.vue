@@ -33,8 +33,8 @@
                   <v-icon color="success" class="check-icon">mdi-check-circle</v-icon>
                 </template>
                 <template v-else>
-                  <v-btn class="custom-btn" elevation="8" color="primary" @click.stop="checkSubscription(channel)">
-                    Подписаться
+                  <v-btn class="custom-btn" elevation="5" color="primary" @click.stop="checkSubscription(channel)">
+                    Проверить
                   </v-btn>
                 </template>
               </v-col>

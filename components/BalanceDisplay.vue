@@ -1,10 +1,12 @@
 <template>
   <div class="balance-container">
-    <div v-if="loading" class="loading">Загрузка баланса...</div>
-    <div v-else>
-      <p>Баланс: <span class="balance-amount">{{ balance }} ₿</span></p>
-      <p>Заморожено: <span class="balance-amount">{{ frozenBalance }} ₿</span></p>
+    <div class="balance-item">
+      <p class="balance-amount">{{ balance }} ₿</p>
     </div>
+<!--    <div class="balance-item">-->
+<!--      <h1 class="balance-label">Заморожено:</h1>-->
+<!--      <p class="balance-amount">{{ frozenBalance }} ₿</p>-->
+<!--    </div>-->
   </div>
 </template>
 
@@ -65,13 +67,32 @@ export default {
 
 <style scoped>
 .balance-container {
-  text-align: center;
-  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px; /* Уменьшены отступы */
+  background-color: #121212;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.balance-item {
+  display: flex;
+  align-items: center;
+}
+
+.balance-label {
+  font-size: 0.9rem; /* Немного уменьшен размер шрифта */
+  color: #e0e0e0;
+  margin-right: 4px; /* Уменьшен отступ между текстом */
+  white-space: nowrap;
 }
 
 .balance-amount {
-  font-size: 1.5rem;
+  font-size: 1.2rem; /* Уменьшен размер текста */
   color: #00FFFF;
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .loading {
