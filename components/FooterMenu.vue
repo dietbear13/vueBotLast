@@ -41,6 +41,7 @@ export default {
   justify-content: space-around;
   padding: 10px 0;
   background-color: #121212;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .menu-item {
@@ -75,10 +76,5 @@ export default {
 
 .menu-item.active .v-icon {
   color: #FF6EC7 !important;
-}
-
-.menu-item:focus, .menu-item:active {
-  outline: none !important; /* Убираем фокус при клике */
-  box-shadow: none !important; /* Убираем тени при клике */
 }
 </style>
