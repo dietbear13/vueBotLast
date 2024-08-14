@@ -7,7 +7,7 @@
       class="menu-item"
     >
       <v-icon>{{ item.icon }}</v-icon>
-
+      {{ item.text }}
     </v-btn>
   </v-footer>
 </template>
@@ -17,7 +17,7 @@ export default {
   data() {
     return {
       menuItems: [
-        { text: 'Розыгрыши', link: '/', icon: 'mdi-trophy' },
+        { text: 'Заработок', link: '/', icon: 'mdi-trophy' },
         { text: 'Ставки', link: '/betting', icon: 'mdi-cash' },
         { text: 'Аккаунт', link: '/protocol', icon: 'mdi-account' }
       ]
@@ -48,7 +48,7 @@ export default {
 }
 
 .menu-item v-icon {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   margin-bottom: 5px;
   display: block;
 }
