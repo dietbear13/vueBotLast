@@ -67,7 +67,6 @@
 </style>
 
 <script>
-import { retrieveLaunchParams } from '@telegram-apps/sdk';
 import FooterMenu from '../components/FooterMenu.vue';
 import BalanceDisplay from '../components/BalanceDisplay.vue';
 
@@ -79,8 +78,13 @@ export default {
   name: 'DefaultLayout',
   data() {
     return {
-      balance: 0,
-      frozenBalance: 0,
+      giveaway: null,
+      rewardMessage: '',
+      snackbar: false,
+      snackbarMessage: '',
+      snackbarColor: '',
+      telegram: null,
+      price: 0,
     };
   },
 
@@ -89,8 +93,8 @@ export default {
       // Получаем initData из Telegram Web App SDK
       const { initData } = retrieveLaunchParams();
 
-      // Проверяем и выводим данные для отладки
-      console.log('initData:', initData);
+
+      console.log('initData DEFAULT:', initData);
 
       // Извлекаем Telegram User ID
       const userId = initData && initData.user && initData.user.id;
@@ -103,6 +107,13 @@ export default {
       } else {
         console.error('Ошибка: ID пользователя не найден');
       }
+
+      await this.loadGiveawayData();
+      if (!this.giveaway) {
+        console.log('Данные о розыгрыше не загружены.');
+      }
+
+      this.getTelegramChannelAvatar();
     } catch (error) {
       console.error('Ошибка инициализации Telegram WebApp', error);
     }

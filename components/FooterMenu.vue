@@ -35,46 +35,46 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .footer-menu {
   display: flex;
   justify-content: space-around;
   padding: 10px 0;
-  background-color: #121212;
+  background-color: #1E1E1E; /* Темная подложка */
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .menu-item {
   flex: 1;
   text-align: center;
-  color: #FFF;
+  color: #ECEFF1; /* Белый текст */
   font-size: 0.85rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 10px 0;
   transition: color 0.3s, transform 0.3s;
-  border: none !important; /* Убираем рамку */
-  outline: none !important; /* Убираем выделение */
-  box-shadow: none !important; /* Убираем тень */
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .menu-item > .v-icon {
-  font-size: 1.8rem !important; /* Увеличиваем размер иконки */
-  margin-bottom: 10px !important; /* Уменьшаем отступ снизу */
+  font-size: 1.8rem !important;
+  margin-bottom: 10px !important;
 }
 
 .menu-item span {
-  font-size: 0.75rem !important; /* Немного уменьшаем размер текста */
+  font-size: 0.75rem !important;
   display: block;
 }
 
 .menu-item.active {
-  color: #FF6EC7 !important;
+  color: #00BFA6 !important; /* Мятный цвет для активного элемента */
   transform: translateY(-2px) !important;
 }
 
 .menu-item.active .v-icon {
-  color: #FF6EC7 !important;
+  color: #00BFA6 !important; /* Мятный цвет иконки для активного элемента */
 }
 </style>

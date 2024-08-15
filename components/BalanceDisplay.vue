@@ -1,13 +1,10 @@
 <template>
-  <div class="balance-container">
-    <div class="balance-item">
-      <p class="balance-amount">{{ balance }} ₿</p>
-    </div>
-<!--    <div class="balance-item">-->
-<!--      <h1 class="balance-label">Заморожено:</h1>-->
-<!--      <p class="balance-amount">{{ frozenBalance }} ₿</p>-->
-<!--    </div>-->
-  </div>
+  <v-card>
+    <v-card-title>Баланс</v-card-title>
+    <v-card-text>
+      <div class="balance">{{ balance }} ₿</div>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
@@ -66,52 +63,8 @@ export default {
 </script>
 
 <style scoped>
-.balance-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px; /* Уменьшены отступы */
-  background-color: #121212;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-.balance-item {
-  display: flex;
-  align-items: center;
-}
-
-.balance-label {
-  font-size: 0.9rem; /* Немного уменьшен размер шрифта */
-  color: #e0e0e0;
-  margin-right: 4px; /* Уменьшен отступ между текстом */
-  white-space: nowrap;
-}
-
-.balance-amount {
-  font-size: 1.2rem; /* Уменьшен размер текста */
-  color: #00FFFF;
-  font-weight: bold;
-  white-space: nowrap;
-}
-
-.loading {
-  color: #00FFFF;
-}
-
-.balance-update-animation {
-  animation: pulse 1s ease-in-out;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
+.balance {
+  font-size: 24px;
+  color: #00BFA6; /* Мятный цвет */
 }
 </style>

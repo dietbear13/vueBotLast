@@ -5,11 +5,28 @@
     <v-divider class="my-4"></v-divider>
 
     <v-row>
-      <v-col v-for="event in events" :key="event._id" cols="12" md="6">
-        <EventItem :event="event" />
+      <v-col v-for="event in events" :key="event._id" cols="12">
+        <v-card class="event-card">
+          <v-card-title class="event-title">
+            <v-chip class="sport-tag" color="primary" text-color="white">{{ event.sport }}</v-chip>
+            {{ event.title }}
+          </v-card-title>
+          <v-card-subtitle class="event-time">
+            {{ event.time }}
+          </v-card-subtitle>
+          <v-card-text class="event-odds">
+            <v-row>
+              <v-col v-for="(odds, index) in event.odds" :key="index" class="odds-col">
+                <div class="odds-type">{{ odds.type }}</div>
+                <div class="odds-value">{{ odds.value }}</div>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
       </v-col>
     </v-row>
-    <FooterMenu />
+
+    <FooterMenu/>
   </v-container>
 </template>
 
@@ -17,11 +34,11 @@
 import EventItem from "../components/EventItem.vue";
 import FooterMenu from '../components/FooterMenu.vue';
 import PageHeader from '../components/PageHeader.vue';
+
 export default {
   data() {
     return {
       events: [],
-      betOptions: [10, 50, 100, 500, 1000]
     };
   },
 
@@ -38,10 +55,6 @@ export default {
         console.error("Ошибка загрузки данных о спортивных событиях", error);
       }
     },
-    placeBet(amount) {
-      console.log(`Поставить ${amount}`);
-      // Реализация ставки
-    }
   },
 
   components: {
@@ -53,21 +66,47 @@ export default {
 </script>
 
 <style scoped>
-.betting-container {
+.event-card {
+  background-color: #1E1E1E;
+  margin-bottom: 20px;
+  padding: 10px;
+  color: #ECEFF1;
+}
+
+.event-title {
   display: flex;
-  justify-content: space-around;
-  padding: 20px;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 
-.bet-button {
-  font-size: 1.25rem;
-  color: #000;
-  background-color: #FF6EC7;
-  margin: 5px;
-  transition: transform 0.2s ease;
+.sport-tag {
+  font-size: 0.8rem;
+  margin-right: 10px;
 }
 
-.bet-button:active {
-  transform: scale(1.1);
+.event-time {
+  color: #B0BEC5;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.event-odds {
+  margin-top: 10px;
+}
+
+.odds-col {
+  text-align: center;
+}
+
+.odds-type {
+  font-size: 0.85rem;
+  color: #B0BEC5;
+}
+
+.odds-value {
+  font-size: 1.1rem;
+  color: #00BFA6; /* Мятный цвет */
 }
 </style>
