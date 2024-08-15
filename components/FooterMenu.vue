@@ -5,7 +5,7 @@
       :key="item.text"
       @click="navigate(item.link)"
       :class="['menu-item', { active: isActive(item.link) }]"
-      flat
+      text
     >
       <v-icon>{{ item.icon }}</v-icon>
       <span>{{ item.text }}</span>

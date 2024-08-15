@@ -1,112 +1,129 @@
-<template>
-  <v-container>
-    <PageHeader title="Ставки" />
+<!--<template>-->
+<!--  <v-container>-->
+<!--    <PageHeader title="Ставки" />-->
 
-    <v-divider class="my-4"></v-divider>
+<!--    &lt;!&ndash; Табы для выбора спорта &ndash;&gt;-->
+<!--    <v-tabs v-model="selectedSport" grow>-->
+<!--      <v-tab v-for="(icon, sport) in sports" :key="sport">-->
+<!--        <v-icon>{{ icon }}</v-icon> {{ sport }}-->
+<!--      </v-tab>-->
+<!--    </v-tabs>-->
 
-    <v-row>
-      <v-col v-for="event in events" :key="event._id" cols="12">
-        <v-card class="event-card">
-          <v-card-title class="event-title">
-            <v-chip class="sport-tag" color="primary" text-color="white">{{ event.sport }}</v-chip>
-            {{ event.title }}
-          </v-card-title>
-          <v-card-subtitle class="event-time">
-            {{ event.time }}
-          </v-card-subtitle>
-          <v-card-text class="event-odds">
-            <v-row>
-              <v-col v-for="(odds, index) in event.odds" :key="index" class="odds-col">
-                <div class="odds-type">{{ odds.type }}</div>
-                <div class="odds-value">{{ odds.value }}</div>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+<!--    <v-divider class="my-4"></v-divider>-->
 
-    <FooterMenu/>
-  </v-container>
-</template>
+<!--    &lt;!&ndash; Таблица с событиями и коэффициентами &ndash;&gt;-->
+<!--    <v-table dense>-->
+<!--      <thead>-->
+<!--      <tr>-->
+<!--        <th>Событие</th>-->
+<!--        <th>Коэффициенты</th>-->
+<!--        <th>Общее количество ставок</th>-->
+<!--      </tr>-->
+<!--      </thead>-->
+<!--      <tbody>-->
+<!--      <tr v-for="event in filteredEvents" :key="event._id">-->
+<!--        <BettingItem :event="event" @place-bet="openBetDialog" />-->
+<!--      </tr>-->
+<!--      </tbody>-->
+<!--    </v-table>-->
 
-<script>
-import EventItem from "../components/EventItem.vue";
-import FooterMenu from '../components/FooterMenu.vue';
-import PageHeader from '../components/PageHeader.vue';
+<!--    &lt;!&ndash; Диалог для ввода суммы ставки &ndash;&gt;-->
+<!--    <v-dialog v-model="betDialog" max-width="400">-->
+<!--      <v-card>-->
+<!--        <v-card-title>Ставка на {{ selectedOutcome }}</v-card-title>-->
+<!--        <v-card-text>-->
+<!--          <v-text-field v-model="betAmount" label="Введите сумму ставки" type="number"></v-text-field>-->
+<!--        </v-card-text>-->
+<!--        <v-card-actions>-->
+<!--          <v-btn color="primary" @click="placeBet">Поставить</v-btn>-->
+<!--          <v-btn text @click="closeBetDialog">Отмена</v-btn>-->
+<!--        </v-card-actions>-->
+<!--      </v-card>-->
+<!--    </v-dialog>-->
 
-export default {
-  data() {
-    return {
-      events: [],
-    };
-  },
+<!--    <FooterMenu />-->
+<!--  </v-container>-->
+<!--</template>-->
 
-  async mounted() {
-    await this.fetchEvents(); // Fetch data when the component is mounted
-  },
+<!--<script>-->
+<!--import FooterMenu from '../components/FooterMenu.vue';-->
+<!--import PageHeader from '../components/PageHeader.vue';-->
+<!--import BettingItem from "../components/BettingItem.vue";-->
 
-  methods: {
-    async fetchEvents() {
-      try {
-        const {data} = await this.$api.sportsEvents();
-        this.events = data; // Populate the `events` array with data from the backend
-      } catch (error) {
-        console.error("Ошибка загрузки данных о спортивных событиях", error);
-      }
-    },
-  },
+<!--export default {-->
+<!--  components: {-->
+<!--    FooterMenu,-->
+<!--    PageHeader,-->
+<!--    BettingItem,-->
+<!--  },-->
+<!--  data() {-->
+<!--    return {-->
+<!--      selectedSport: 'Футбол',-->
+<!--      sports: {-->
+<!--        'Футбол': 'mdi-soccer',-->
+<!--        'Теннис': 'mdi-tennis',-->
+<!--        // Добавить другие виды спорта при необходимости-->
+<!--      },-->
+<!--      events: [],-->
+<!--      betDialog: false,-->
+<!--      selectedOutcome: '',-->
+<!--      betAmount: 0,-->
+<!--      selectedEvent: null,-->
+<!--    };-->
+<!--  },-->
+<!--  computed: {-->
+<!--    filteredEvents() {-->
+<!--      return this.events.filter(event => event.sport === this.selectedSport);-->
+<!--    }-->
+<!--  },-->
+<!--  methods: {-->
+<!--    openBetDialog(event, outcome) {-->
+<!--      this.selectedEvent = event;-->
+<!--      this.selectedOutcome = outcome;-->
+<!--      this.betDialog = true;-->
+<!--    },-->
+<!--    closeBetDialog() {-->
+<!--      this.betDialog = false;-->
+<!--      this.selectedOutcome = '';-->
+<!--      this.betAmount = 0;-->
+<!--    },-->
+<!--    async placeBet() {-->
+<!--      try {-->
+<!--        console.log(`Ставка на ${this.selectedOutcome} в событии ${this.selectedEvent.title} на сумму ${this.betAmount}`);-->
+<!--        this.closeBetDialog();-->
+<!--      } catch (error) {-->
+<!--        console.error('Ошибка при попытке сделать ставку', error);-->
+<!--      }-->
+<!--    },-->
+<!--    async fetchEvents() {-->
+<!--      try {-->
+<!--        const { data } = await this.$api.sportsEvents();-->
+<!--        console.log("Fetched Events Data:", data);  // Лог для проверки данных-->
+<!--        this.events = data;-->
+<!--      } catch (error) {-->
+<!--        console.error("Ошибка загрузки данных о спортивных событиях", error);-->
+<!--      }-->
+<!--    }-->
+<!--  },-->
+<!--  async mounted() {-->
+<!--    await this.fetchEvents();-->
+<!--  }-->
+<!--};-->
+<!--</script>-->
 
-  components: {
-    EventItem,
-    FooterMenu,
-    PageHeader
-  },
-};
-</script>
+<!--<style scoped>-->
+<!--.v-simple-table th {-->
+<!--  background-color: #1E1E1E;-->
+<!--  color: #ECEFF1;-->
+<!--}-->
 
-<style scoped>
-.event-card {
-  background-color: #1E1E1E;
-  margin-bottom: 20px;
-  padding: 10px;
-  color: #ECEFF1;
-}
+<!--.v-simple-table td {-->
+<!--  background-color: #2A2A2A;-->
+<!--  color: #ECEFF1;-->
+<!--  padding: 10px;-->
+<!--}-->
 
-.event-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-.sport-tag {
-  font-size: 0.8rem;
-  margin-right: 10px;
-}
-
-.event-time {
-  color: #B0BEC5;
-  font-size: 0.9rem;
-  margin-top: 5px;
-}
-
-.event-odds {
-  margin-top: 10px;
-}
-
-.odds-col {
-  text-align: center;
-}
-
-.odds-type {
-  font-size: 0.85rem;
-  color: #B0BEC5;
-}
-
-.odds-value {
-  font-size: 1.1rem;
-  color: #00BFA6; /* Мятный цвет */
-}
-</style>
+<!--.v-btn {-->
+<!--  margin: 5px;-->
+<!--}-->
+<!--</style>-->

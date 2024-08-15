@@ -39,7 +39,7 @@ export default {
   router: {
     extendRoutes(routes, resolve) {
       routes.push({
-        name: 'betting',
+        // name: 'betting',
         path: '/betting',
         component: resolve(__dirname, 'pages/betting.vue')
       });
