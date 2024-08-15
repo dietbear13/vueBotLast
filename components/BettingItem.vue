@@ -1,22 +1,17 @@
 <template>
-  <v-row>
-    <v-col cols="12">
-      <v-card>
-        <v-card-title>{{ event.participant1 }} vs {{ event.participant2 }}</v-card-title>
-        <v-card-subtitle>Коэффициенты:</v-card-subtitle>
-        <v-card-actions>
-          <v-btn small @click="$emit('place-bet', event, 'П1')">П1: {{ event.current_odds_p1 }}</v-btn>
-          <v-btn small @click="$emit('place-bet', event, 'Х')">Х: {{ event.current_odds_x }}</v-btn>
-          <v-btn small @click="$emit('place-bet', event, 'П2')">П2: {{ event.current_odds_p2 }}</v-btn>
-        </v-card-actions>
-        <v-card-subtitle>
-          Общее количество ставок: {{ event.total_bets }}
-        </v-card-subtitle>
-        <!-- Временный текст -->
-        <div>Компонент BettingItem рендерится</div>
-      </v-card>
-    </v-col>
-  </v-row>
+  <v-card>
+    <v-card-title class="d-flex justify-center">
+      {{ event.participant1 }} vs {{ event.participant2 }}
+    </v-card-title>
+    <v-card-actions class="d-flex justify-around">
+      <v-btn small @click="$emit('place-bet', event, 'П1')">П1: {{ event.current_odds_p1 }}</v-btn>
+      <v-btn small @click="$emit('place-bet', event, 'Х')">Х: {{ event.current_odds_x }}</v-btn>
+      <v-btn small @click="$emit('place-bet', event, 'П2')">П2: {{ event.current_odds_p2 }}</v-btn>
+    </v-card-actions>
+    <v-card-subtitle class="text-center">
+      Общее количество ставок: {{ event.total_bets }}
+    </v-card-subtitle>
+  </v-card>
 </template>
 
 <script>
@@ -67,5 +62,19 @@ export default {
 .v-card {
   background-color: #1E1E1E;
   color: #ECEFF1;
+}
+.v-card-title {
+  font-weight: bold;
+}
+.v-card-actions {
+  margin-top: 10px;
+}
+.v-btn {
+  background-color: #2A2A2A;
+  color: #00BFA6;
+}
+.v-card-subtitle {
+  margin-top: 10px;
+  font-size: 0.9em;
 }
 </style>

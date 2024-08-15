@@ -3,37 +3,38 @@
     <PageHeader title="Ставки" />
 
     <!-- Табы для выбора спорта -->
-    <v-tabs v-model="selectedSport" grow>
-      <v-tab v-for="(icon, sport) in sports" :key="sport" :value="sport">
-        <v-icon>{{ icon }}</v-icon> {{ sport }}
+    <v-tabs :value="selectedSport" grow>
+      <v-tab v-for="(icon, sport) in sports" :key="sport" @click="setSport(sport)">
+        <v-icon>{{ icon }}</v-icon>
       </v-tab>
     </v-tabs>
 
     <v-divider class="my-4"></v-divider>
 
     <!-- Таблица с событиями и коэффициентами -->
-    <v-data-table
-      :headers="headers"
-      :items="events"
-      :items-per-page="5"
-      :custom-filter="filterBySport"
-      :search="selectedSport"
+    <v-tabs-items v-model="selectedSport">
+      <v-tab-item v-for="(icon, sport) in sports" :key="sport" :value="sport">
+        <!-- Таблица с событиями и коэффициентами -->
+        <v-data-table
+          :headers="headers"
+          :items="filteredEvents"
+        :page.sync="page"
+        :items-per-page="itemsPerPage"
+        class="elevation-1"
+        item-key="event._id"
+        dense
+        >
+        <template v-slot:item.actions="{ item }">
+          <!-- Здесь рендерится BettingItem с переданным event -->
+          <BettingItem :event="item" @place-bet="openBetDialog" />
+          <PredictionCalculator :event="item" :userBets="getUserBets(item._id)" />
 
-      class="elevation-1"
-      item-key="event._id"
-
-      dense
-    >
-      <template v-slot:item.actions="{ item }">
-        <!-- Здесь рендерится BettingItem с переданным event -->
-        <BettingItem :event="item" @place-bet="openBetDialog" />
-
-      </template>
-    </v-data-table>
-    <div v-if="events.length === 0">Нет доступных событий</div>
-    <div v-else>
-      <div v-for="event in events" :key="event._id">{{ event }}</div>
-    </div>
+        </template>
+        </v-data-table>
+        <div v-if="filteredEvents.length === 0">Нет доступных событий</div>
+      </v-tab-item>
+    </v-tabs-items>
+    <div v-if="filteredEvents.length === 0">#2 Нет доступных событий</div>
 
     <!-- Диалог для ввода суммы ставки -->
     <v-dialog v-model="betDialog" max-width="400">
@@ -48,6 +49,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <TestComponent />
 
     <FooterMenu />
   </v-container>
@@ -57,47 +59,62 @@
 import FooterMenu from '../components/FooterMenu.vue';
 import PageHeader from '../components/PageHeader.vue';
 import BettingItem from "../components/BettingItem.vue";
+import PredictionCalculator from '../components/PredictionCalculator.vue';
 
 export default {
   components: {
     FooterMenu,
     PageHeader,
     BettingItem,
+    PredictionCalculator,
   },
   data() {
     return {
-      selectedSport: 'football', // Выбранный спорт по умолчанию
+      selectedSport: 'football',
       sports: {
         'football': 'mdi-soccer',
         'tennis': 'mdi-tennis',
-        // Добавить другие виды спорта при необходимости
+        'basketball': 'mdi-basketball',
+        'boxing': 'mdi-boxing-glove',
+        'figure skating': 'mdi-skate',
       },
-      events: [], // Сюда будут загружены события
+      events: [],
+      userBets: [],
       betDialog: false,
       selectedOutcome: '',
       betAmount: 0,
-      selected: null,
+      selectedEvent: null,
       headers: [
-        { text: 'Событие', value: 'participant1' },
+        { text: 'Событие', value: 'title' },
         { text: 'Коэффициенты', value: 'actions', sortable: false },
-        { text: 'Общее количество ставок', value: 'total_bets', sortable: false }
-      ]
+      ],
+      page: 1,
+      itemsPerPage: 5,
+
     };
   },
   computed: {
     filteredEvents() {
-      console.log("!!! event:", this.events);
-      console.log("!!! Selected Sport:", this.selectedSport);
-
       console.log("Selected Sport:", this.selectedSport);
-      const filtered = this.events.filter(event => event.typeEvent === this.selectedSport);
-      console.log("Filtered Events:", filtered);
+      const filtered = this.events.filter(event => {
+        console.log("!! event typeEvent:", event.typeEvent, "Selected Sport:", this.selectedSport);
+        return event.typeEvent === this.selectedSport;
+      });
+      console.log("!! filtered", filtered);
       return filtered;
     }
   },
   methods: {
+    getUserBets(eventId) {
+      if (!this.userBets || this.userBets.length === 0) return [];
+      return this.userBets.filter(bet => bet.eventId === eventId);
+    },
+
     filterBySport(value, search, item) {
       return item.typeEvent === search;
+    },
+    setSport(sport) {
+      this.selectedSport = sport;
     },
 
     openBetDialog(event, outcome) {
@@ -122,16 +139,36 @@ export default {
     async fetchEvents() {
       try {
         const { data } = await this.$api.sportsEvents();
-        console.log("events", this.events);  // Убедитесь, что массив `events` содержит объекты
+        console.log("++Fetched Events Data:", data);  // Убедитесь, что массив `events` содержит объекты
         this.events = data;
-        console.log("Fetched Events Data:", data);  // Лог для проверки данных
+        console.log("++ event", this.events);  // Лог для проверки массива `events`
       } catch (error) {
         console.error("Ошибка загрузки данных о спортивных событиях", error);
+      }
+    },
+    async fetchUserBets() {
+      try {
+        // Заглушка для тестирования
+        this.userBets = [
+          { eventId: 'event1', userId: 'user1', bet: 'p1' },
+          { eventId: 'event2', userId: 'user2', bet: 'p2' },
+          // Добавьте больше тестовых данных, если нужно
+        ];
+      } catch (error) {
+        console.error('Ошибка при получении ставок пользователей', error);
       }
     }
   },
   async mounted() {
     await this.fetchEvents();
+    await this.fetchUserBets();
+    this.selectedSport = 'football'; // Установите значение после загрузки данных
+
+  },
+  watch: {
+    selectedSport(newVal, oldVal) {
+      console.log('Selected Sport changed from:', oldVal, 'to:', newVal);
+    }
   }
 };
 </script>
@@ -151,4 +188,16 @@ export default {
 .v-btn {
   margin: 5px;
 }
+
+.sport-icons {
+  color: #00BFA6; /* Мятный цвет */
+}
+.v-tabs .v-tab {
+  color: #00BFA6; /* Сделать текст табов мятного цвета */
+}
+.v-tab--active .sport-icons {
+  color: #00BFA6; /* Более насыщенный мятный для активного таба */
+}
+
+
 </style>

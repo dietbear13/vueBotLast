@@ -19,3 +19,7 @@ $text-color: #ECEFF1; // Белый текст
   background-color: $card-color;
   color: $text-color;
 }
+
+.v-tabs-slider {
+  background-color: #00BFA6 !important; /* Цвет нижней линии выделения таба */
+}
