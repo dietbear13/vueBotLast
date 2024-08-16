@@ -26,7 +26,13 @@
         >
         <template v-slot:item.actions="{ item }">
           <!-- Здесь рендерится BettingItem с переданным event -->
-          <BettingItem :event="item" @place-bet="openBetDialog" />
+          <BettingItem
+            :event="item"
+            :totalP1="betSummaries[item._id]?.totalP1 || 0"
+            :totalX="betSummaries[item._id]?.totalX || 0"
+            :totalP2="betSummaries[item._id]?.totalP2 || 0"
+            @place-bet="openBetDialog"
+          />
           <PredictionCalculator :event="item" :userBets="getUserBets(item._id)" />
 
         </template>
@@ -49,7 +55,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <TestComponent />
 
     <FooterMenu />
   </v-container>
@@ -60,6 +65,9 @@ import FooterMenu from '../components/FooterMenu.vue';
 import PageHeader from '../components/PageHeader.vue';
 import BettingItem from "../components/BettingItem.vue";
 import PredictionCalculator from '../components/PredictionCalculator.vue';
+// import createApi from '../api'; // Импорт фабричной функции API
+//
+// const api = createApi(axios); // Создаем экземпляр API-клиента
 
 export default {
   components: {
@@ -79,6 +87,7 @@ export default {
         'figure skating': 'mdi-skate',
       },
       events: [],
+      betSummaries: {},
       userBets: [],
       betDialog: false,
       selectedOutcome: '',
@@ -102,9 +111,29 @@ export default {
       });
       console.log("!! filtered", filtered);
       return filtered;
+    },
+    eventBetSummaries() {
+      return this.filteredEvents.map(event => ({
+        ...event,
+        totalP1: this.betSummaries[event._id]?.totalP1 || 0,
+        totalX: this.betSummaries[event._id]?.totalX || 0,
+        totalP2: this.betSummaries[event._id]?.totalP2 || 0,
+      }));
     }
   },
   methods: {
+
+  async fetchBetSummaries() {
+    try {
+      const { data } = await this.$api.getBetsSummary(); // Используйте существующий $api объект
+      this.betSummaries = data.reduce((acc, curr) => {
+        acc[curr.eventId] = curr;
+        return acc;
+      }, {});
+    } catch (error) {
+      console.error('Ошибка загрузки сумм ставок', error);
+    }
+  },
     getUserBets(eventId) {
       if (!this.userBets || this.userBets.length === 0) return [];
       return this.userBets.filter(bet => bet.eventId === eventId);
@@ -162,6 +191,7 @@ export default {
   async mounted() {
     await this.fetchEvents();
     await this.fetchUserBets();
+    await this.fetchBetSummaries();
     this.selectedSport = 'football'; // Установите значение после загрузки данных
 
   },

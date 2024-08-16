@@ -11,6 +11,9 @@
     <v-card-subtitle class="text-center">
       Общее количество ставок: {{ event.total_bets }}
     </v-card-subtitle>
+    <v-card-subtitle class="text-center">
+      Ставки на П1: {{ totalP1 }} | Ставки на Х: {{ totalX }} | Ставки на П2: {{ totalP2 }}
+    </v-card-subtitle>
   </v-card>
 </template>
 
@@ -20,6 +23,18 @@ export default {
     event: {
       type: Object,
       required: true
+    },
+    totalP1: {
+      type: Number,
+      default: 0
+    },
+    totalX: {
+      type: Number,
+      default: 0
+    },
+    totalP2: {
+      type: Number,
+      default: 0
     }
   },
   created() {
