@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <PageHeader title="Ставки" />
+    <PageHeader title="Ставки"/>
 
     <!-- Табы для выбора спорта -->
     <v-tabs :value="selectedSport" grow>
@@ -18,29 +18,35 @@
         <v-data-table
           :headers="headers"
           :items="filteredEvents"
-        :page.sync="page"
-        :items-per-page="itemsPerPage"
-        class="elevation-1"
-        item-key="event._id"
-        dense
-        >
-        <template v-slot:item.actions="{ item }">
-          <!-- Здесь рендерится BettingItem с переданным event -->
-          <BettingItem
-            :event="item"
-            :totalP1="betSummaries[item._id]?.totalP1 || 0"
-            :totalX="betSummaries[item._id]?.totalX || 0"
-            :totalP2="betSummaries[item._id]?.totalP2 || 0"
-            @place-bet="openBetDialog"
-          />
-          <PredictionCalculator :event="item" :userBets="getUserBets(item._id)" />
+          :page.sync="page"
+          :items-per-page="itemsPerPage"
+          :disable-sort="true"
+          :calculate-widths="true"
+          class="elevation-1"
+          item-key="event._id"
+          dense
+          hide-default-footer
+          :mobile-breakpoint="0"
+          :show-group-by="true"
+          :group-by="['title']"
 
-        </template>
+        >
+          <template v-slot:item.actions="{ item }">
+            <!-- Здесь рендерится BettingItem с переданным event -->
+            <BettingItem
+              :event="item"
+              :countP1="betSummaries[item._id]?.countP1 || 0"
+              :countX="betSummaries[item._id]?.countX || 0"
+              :countP2="betSummaries[item._id]?.countP2 || 0"
+              @place-bet="openBetDialog"
+            />
+            <PredictionCalculator :event="item" :userBets="getUserBets(item._id)"/>
+
+          </template>
         </v-data-table>
         <div v-if="filteredEvents.length === 0">Нет доступных событий</div>
       </v-tab-item>
     </v-tabs-items>
-    <div v-if="filteredEvents.length === 0">#2 Нет доступных событий</div>
 
     <!-- Диалог для ввода суммы ставки -->
     <v-dialog v-model="betDialog" max-width="400">
@@ -54,9 +60,22 @@
           <v-btn text @click="closeBetDialog">Отмена</v-btn>
         </v-card-actions>
       </v-card>
+      <v-pagination
+        v-model="page"
+        :length="pageCount"
+      ></v-pagination>
+      <v-text-field
+        :value="itemsPerPage"
+        label="Items per page"
+        type="number"
+        min="-1"
+        max="15"
+        @input="itemsPerPage = parseInt($event, 10)"
+      ></v-text-field>
+
     </v-dialog>
 
-    <FooterMenu />
+    <FooterMenu/>
   </v-container>
 </template>
 
@@ -94,8 +113,8 @@ export default {
       betAmount: 0,
       selectedEvent: null,
       headers: [
-        { text: 'Событие', value: 'title' },
-        { text: 'Коэффициенты', value: 'actions', sortable: false },
+        {text: 'Событие', value: 'title', width: '20%'},
+        {text: 'Коэффициенты', value: 'actions', sortable: false, width: '80%'},
       ],
       page: 1,
       itemsPerPage: 5,
@@ -123,17 +142,17 @@ export default {
   },
   methods: {
 
-  async fetchBetSummaries() {
-    try {
-      const { data } = await this.$api.getBetsSummary(); // Используйте существующий $api объект
-      this.betSummaries = data.reduce((acc, curr) => {
-        acc[curr.eventId] = curr;
-        return acc;
-      }, {});
-    } catch (error) {
-      console.error('Ошибка загрузки сумм ставок', error);
-    }
-  },
+    async fetchBetSummaries() {
+      try {
+        const {data} = await this.$api.getBetsSummary(); // Используйте существующий $api объект
+        this.betSummaries = data.reduce((acc, curr) => {
+          acc[curr.eventId] = curr;
+          return acc;
+        }, {});
+      } catch (error) {
+        console.error('Ошибка загрузки сумм ставок', error);
+      }
+    },
     getUserBets(eventId) {
       if (!this.userBets || this.userBets.length === 0) return [];
       return this.userBets.filter(bet => bet.eventId === eventId);
@@ -167,7 +186,7 @@ export default {
     },
     async fetchEvents() {
       try {
-        const { data } = await this.$api.sportsEvents();
+        const {data} = await this.$api.sportsEvents();
         console.log("++Fetched Events Data:", data);  // Убедитесь, что массив `events` содержит объекты
         this.events = data;
         console.log("++ event", this.events);  // Лог для проверки массива `events`
@@ -179,8 +198,8 @@ export default {
       try {
         // Заглушка для тестирования
         this.userBets = [
-          { eventId: 'event1', userId: 'user1', bet: 'p1' },
-          { eventId: 'event2', userId: 'user2', bet: 'p2' },
+          {eventId: 'event1', userId: 'user1', bet: 'p1'},
+          {eventId: 'event2', userId: 'user2', bet: 'p2'},
           // Добавьте больше тестовых данных, если нужно
         ];
       } catch (error) {
@@ -222,9 +241,11 @@ export default {
 .sport-icons {
   color: #00BFA6; /* Мятный цвет */
 }
+
 .v-tabs .v-tab {
   color: #00BFA6; /* Сделать текст табов мятного цвета */
 }
+
 .v-tab--active .sport-icons {
   color: #00BFA6; /* Более насыщенный мятный для активного таба */
 }

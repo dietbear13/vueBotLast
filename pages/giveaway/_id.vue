@@ -1,13 +1,18 @@
 <template>
   <v-container class="giveaway-details">
     <PageHeader title="Детали розыгрыша" />
+    <v-divider class="my-4"></v-divider>
+
+    <!-- Информация о розыгрыше -->
     <p v-if="giveaway" class="giveaway-description">
       Здесь находится информация о розыгрыше <span>{{ giveaway.title }}</span>
     </p>
 
-    <!-- Добавленный блок для сообщения о награде -->
+    <!-- Сообщение о награде или предупреждение о неполной подписке -->
     <p v-if="rewardMessage" class="reward-message">{{ rewardMessage }}</p>
+    <p v-else-if="!allSubscribed" class="warning-message">Вы не подписаны на все каналы розыгрыша!</p>
 
+    <!-- Список каналов -->
     <v-list lines="one" v-if="giveaway">
       <v-list-item v-for="channel in giveaway.channels" :key="channel.id" class="channel-item">
         <v-card
@@ -32,7 +37,7 @@
               </v-col>
               <v-card-actions>
                 <v-icon v-if="channel.subscribed" color="success" class="check-icon">mdi-check-circle</v-icon>
-                <v-btn v-else variant="text" text class="custom-btn" color="primary" @click.stop="checkSubscription(channel)">
+                <v-btn v-else variant="text" class="custom-btn" color="primary" @click.stop="checkSubscription(channel)">
                   Проверить
                 </v-btn>
               </v-card-actions>
@@ -41,27 +46,28 @@
         </v-card>
       </v-list-item>
     </v-list>
+
+    <!-- Уведомление (Snackbar) -->
     <v-snackbar v-model="snackbar" :timeout="2000" top right :color="snackbarColor">
       {{ snackbarMessage }}
     </v-snackbar>
+
     <FooterMenu />
   </v-container>
 </template>
 
 <script>
 import FooterMenu from '../../components/FooterMenu.vue';
-import PageHeader from '../../components/PageHeader.vue';
 
 export default {
   components: {
-    FooterMenu,
-    PageHeader
+    FooterMenu
   },
-  name: 'DefaultLayout',
   data() {
     return {
       giveaway: null,
       rewardMessage: '',
+      allSubscribed: false,  // Флаг для отслеживания подписки на все каналы
       snackbar: false,
       snackbarMessage: '',
       snackbarColor: '',
@@ -75,15 +81,14 @@ export default {
       this.telegram.ready();
 
       const initData = this.telegram.initDataUnsafe;
-      const userId = initData && initData.user && initData.user.id;
+      const userId = initData?.user?.id;
+
       if (userId) {
-        await this.getUserBalance(userId);
+        await this.loadGiveawayData();
+        await this.checkAllSubscriptions();
       } else {
         console.error('Ошибка: ID пользователя не найден');
       }
-
-      await this.loadGiveawayData();
-      this.getTelegramChannelAvatar();
     } catch (error) {
       console.error('Ошибка инициализации Telegram WebApp', error);
     }
@@ -92,9 +97,8 @@ export default {
   methods: {
     async loadGiveawayData() {
       try {
-        const { data } = await this.$api.giveaway(this.$route.params.id);
+        const { data } = await this.$axios.get(`/api/giveaways/${this.$route.params.id}`);
         this.giveaway = data;
-        await this.checkAllSubscriptions();
       } catch (error) {
         console.error("Ошибка при загрузке данных розыгрыша:", error);
       }
@@ -104,6 +108,7 @@ export default {
       try {
         const telegramId = this.telegram.initDataUnsafe.user.id;
 
+        // Проверка подписки через сервер
         const response = await this.$axios.post(`/api/check-subscription`, {
           telegramId,
           channelId: channel.id
@@ -112,16 +117,16 @@ export default {
         const isSubscribed = response.data.isMember;
 
         if (isSubscribed) {
-          this.$set(channel, 'subscribed', true);
-          this.snackbarMessage = 'Вы успешно подписаны на канал';
-          this.snackbarColor = 'green';
-
+          // Обновление данных в базе через сервер
           await this.$axios.post(`/api/subscribe`, {
             telegramId,
             channelId: channel.id,
             giveawayId: this.giveaway._id
           });
 
+          this.snackbarMessage = 'Вы успешно подписаны на канал';
+          this.snackbarColor = 'green';
+          this.$set(channel, 'subscribed', true);
           await this.checkAllSubscriptions();
         } else {
           this.snackbarMessage = 'Вы не подписаны на канал';
@@ -137,31 +142,21 @@ export default {
       }
     },
 
-    async getUserBalance(userId) {
-      try {
-        const { data } = await this.$api.getUserBalance(userId);
-      } catch (error) {
-        console.error("Ошибка при получении баланса пользователя:", error);
-      }
-    },
-
     async checkAllSubscriptions() {
       try {
         const telegramId = this.telegram.initDataUnsafe.user.id;
         const response = await this.$axios.get(`/api/get-subscriptions/${telegramId}`);
         const userSubscriptions = response.data.channels;
 
-        let allSubscribed = true;
-        this.giveaway.channels.forEach(channel => {
+        this.allSubscribed = this.giveaway.channels.every(channel => {
           const subscription = userSubscriptions.find(sub => sub.id === channel.id);
-          if (subscription && subscription.subscribed) {
-            this.$set(channel, 'subscribed', true);
-          } else {
-            allSubscribed = false;
+          if (subscription) {
+            this.$set(channel, 'subscribed', subscription.subscribed);
           }
+          return subscription && subscription.subscribed;
         });
 
-        if (allSubscribed) {
+        if (this.allSubscribed) {
           this.rewardMessage = `Выдана награда ${this.giveaway.prize} монет`;
         }
       } catch (error) {
@@ -171,14 +166,6 @@ export default {
 
     openChannel(link) {
       window.open(link, '_blank');
-    },
-
-    goBack() {
-      this.$router.push({ name: 'index' });
-    },
-
-    getTelegramChannelAvatar() {
-      const avatarUrl = this.telegram.initDataUnsafe.user?.photo_url;
     }
   }
 };
@@ -197,24 +184,28 @@ export default {
   font-weight: bold;
 }
 
-.reward-message {
+.reward-message, .warning-message {
   color: #00BFA6; /* Мятный цвет */
   font-weight: bold;
   margin-top: 20px;
 }
 
+.warning-message {
+  color: #FF5252; /* Красный цвет */
+}
+
 .channel-item {
   margin-bottom: 16px;
-  width: 100%; /* Делаем элементы на 100% ширины */
+  width: 100%;
 }
 
 .channel-card {
-  background-color: #1E1E1E; /* Темная подложка */
+  background-color: #1E1E1E;
   border-radius: 12px;
   padding: 12px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  width: 100%; /* Делаем карточки на 100% ширины */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Добавляем тень */
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .channel-avatar {
@@ -230,15 +221,7 @@ export default {
 
 .check-icon {
   font-size: 24px;
-  color: #00BFA6; /* Мятный цвет */
-}
-
-.back-btn {
-  width: 100%;
-  background-color: #00BFA6; /* Мятный цвет */
-  color: #121212; /* Темный текст */
-  font-weight: bold;
-  text-transform: uppercase;
+  color: #00BFA6;
 }
 
 .v-snackbar {
@@ -248,6 +231,6 @@ export default {
 .v-btn {
   font-weight: bold;
   text-transform: uppercase;
-  color: #00BFA6; /* Мятный цвет */
+  color: #00BFA6;
 }
 </style>

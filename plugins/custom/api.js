@@ -18,6 +18,11 @@ export default (axios) => {
     },
     getBetsSummary: () => {
       return axios.get("http://localhost:3001/api/events/bets-summary");
+    },
+    getUserProfile: (telegramId) => {
+      return axios.get("http://localhost:3001/api/user/profile", {
+        params: { telegramId }
+      });
     }
   }
 }

@@ -1,46 +1,49 @@
 <template>
-  <v-card>
-    <v-card-title>Баланс</v-card-title>
-    <v-card-text>
-      <div class="balance">{{ balance }} ₿</div>
-    </v-card-text>
+  <v-card class="balance-card">
+    <v-card-title class="d-flex justify-end align-center">
+      <!-- Вся строка с балансом и иконкой -->
+      <div class="d-flex align-center">
+        <div class="balance">{{ balance }} ₿</div>
+        <v-icon size="44" @click="goToAccountPage" class="account-icon" color="#00BFA6">mdi-account-circle</v-icon>
+      </div>
+    </v-card-title>
   </v-card>
 </template>
 
 <script>
 import { retrieveLaunchParams } from '@telegram-apps/sdk';
-
 export default {
   data() {
     return {
       balance: 0,
       frozenBalance: 0,
       loading: true,
-      error: null
+      error: null,
     };
   },
-  async mounted() {
-    try {
-      // Получаем initData из Telegram Web App SDK
-      const { initData } = retrieveLaunchParams();
-
-      // Извлекаем Telegram User ID
-      const userId = initData && initData.user && initData.user.id;
-
-      if (userId) {
-        await this.getUserBalance(userId);
-      } else {
-        console.error('Ошибка: ID пользователя не найден');
-        this.error = "Ошибка: ID пользователя не найден";
-      }
-    } catch (error) {
-      console.error("Ошибка инициализации Telegram WebApp", error);
-      this.error = "Ошибка инициализации Telegram WebApp";
-    } finally {
-      this.loading = false;
-    }
+  mounted() {
+    this.init();
   },
   methods: {
+    async init() {
+      try {
+        const { initData } = retrieveLaunchParams();
+
+        const userId = initData?.user?.id;
+
+        if (userId) {
+          await this.getUserBalance(userId);
+        } else {
+          console.error('Ошибка: ID пользователя не найден');
+          this.error = 'Ошибка: ID пользователя не найден';
+        }
+      } catch (error) {
+        console.error('Ошибка инициализации Telegram WebApp', error);
+        this.error = 'Ошибка инициализации Telegram WebApp';
+      } finally {
+        this.loading = false;
+      }
+    },
     async getUserBalance(telegramId) {
       try {
         const response = await fetch(`/api/balance/${telegramId}`);
@@ -58,13 +61,23 @@ export default {
         this.error = 'Ошибка загрузки баланса';
       }
     },
-  }
-}
+    goToAccountPage() {
+      this.$router.push('/account');
+    },
+  },
+};
 </script>
 
 <style scoped>
 .balance {
   font-size: 24px;
   color: #00BFA6; /* Мятный цвет */
+  margin-right: 16px;
 }
+
+.account-icon {
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
 </style>

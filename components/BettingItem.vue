@@ -1,19 +1,62 @@
+Копировать код
 <template>
   <v-card>
-    <v-card-title class="d-flex justify-center">
+    <v-card-title class="d-flex justify-right">
       {{ event.participant1 }} vs {{ event.participant2 }}
     </v-card-title>
-    <v-card-actions class="d-flex justify-around">
-      <v-btn small @click="$emit('place-bet', event, 'П1')">П1: {{ event.current_odds_p1 }}</v-btn>
-      <v-btn small @click="$emit('place-bet', event, 'Х')">Х: {{ event.current_odds_x }}</v-btn>
-      <v-btn small @click="$emit('place-bet', event, 'П2')">П2: {{ event.current_odds_p2 }}</v-btn>
+
+    <v-card-actions class="d-flex justify-center align-center">
+      <v-btn small @click="$emit('place-bet', event, 'П1')">П1 {{ event.current_odds_p1 }}</v-btn>
+      <v-btn small @click="$emit('place-bet', event, 'Х')">Х {{ event.current_odds_x }}</v-btn>
+      <v-btn small @click="$emit('place-bet', event, 'П2')">П2 {{ event.current_odds_p2 }}</v-btn>
     </v-card-actions>
-    <v-card-subtitle class="text-center">
-      Общее количество ставок: {{ event.total_bets }}
-    </v-card-subtitle>
-    <v-card-subtitle class="text-center">
-      Ставки на П1: {{ totalP1 }} | Ставки на Х: {{ totalX }} | Ставки на П2: {{ totalP2 }}
-    </v-card-subtitle>
+    <v-row class="text-center" dense>
+      <v-col cols="12">
+        <v-progress-linear height="20" rounded>
+          <!-- П1 -->
+          <v-progress-linear
+            slot="default"
+            :value="percentP1"
+            color="#4CAF50"
+            height="20"
+          >
+            <template v-slot:default="{ value }">
+              <div class="d-flex justify-center align-center" style="color: white;">
+                {{ countP1 }} ({{ percentP1 }}%)
+              </div>
+            </template>
+          </v-progress-linear>
+
+          <!-- Х -->
+          <v-progress-linear
+            slot="default"
+            :value="percentX"
+            color="#2196F3"
+            height="20"
+          >
+            <template v-slot:default="{ value }">
+              <div class="d-flex justify-center align-center" style="color: white;">
+                {{ countX }} ({{ percentX }}%)
+              </div>
+            </template>
+          </v-progress-linear>
+
+          <!-- П2 -->
+          <v-progress-linear
+            slot="default"
+            :value="percentP2"
+            color="#FFC107"
+            height="20"
+          >
+            <template v-slot:default="{ value }">
+              <div class="d-flex justify-center align-center" style="color: white;">
+                {{ countP2 }} ({{ percentP2 }}%)
+              </div>
+            </template>
+          </v-progress-linear>
+        </v-progress-linear>
+      </v-col>
+    </v-row>
   </v-card>
 </template>
 
@@ -24,18 +67,36 @@ export default {
       type: Object,
       required: true
     },
-    totalP1: {
+    countP1: {
       type: Number,
       default: 0
     },
-    totalX: {
+    countX: {
       type: Number,
       default: 0
     },
-    totalP2: {
+    countP2: {
       type: Number,
       default: 0
+    },
+  },
+  computed: {
+    totalCount() {
+      return this.countP1 + this.countX + this.countP2;
+    },
+    percentP1() {
+      return this.totalCount > 0 ? (this.countP1 / this.totalCount) * 100 : 0;
+    },
+    percentX() {
+      return this.totalCount > 0 ? (this.countX / this.totalCount) * 100 : 0;
+    },
+    percentP2() {
+      return this.totalCount > 0 ? (this.countP2 / this.totalCount) * 100 : 0;
+    },
+    pageCount() {
+      return Math.ceil(this.filteredEvents.length / this.itemsPerPage);
     }
+
   },
   created() {
     console.log("BettingItem Created with Event:", this.event);
@@ -92,4 +153,8 @@ export default {
   margin-top: 10px;
   font-size: 0.9em;
 }
+.v-chip {
+  font-weight: bold;
+}
+
 </style>

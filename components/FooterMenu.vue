@@ -20,7 +20,7 @@ export default {
       menuItems: [
         { text: 'Заработок', link: '/', icon: 'mdi-trophy' },
         { text: 'Ставки', link: '/betting', icon: 'mdi-cash' },
-        { text: 'Аккаунт', link: '/protocol', icon: 'mdi-account' }
+        { text: 'Лотерея', link: '/lottery', icon: 'mdi-account' }
       ]
     };
   },

@@ -14,6 +14,7 @@
 import PageHeader from '@/components/PageHeader.vue';
 import GiveAwayItem from "../components/GiveAwayItem.vue";
 import FooterMenu from '../components/FooterMenu.vue';
+import moment from 'moment'; // Используем библиотеку moment.js для форматирования даты
 
 export default {
   components: {
@@ -33,7 +34,13 @@ export default {
     async fetchGiveaways() {
       try {
         const { data } = await this.$api.giveaways();
-        this.giveaways = data.filter(giveaway => giveaway.title);
+        this.giveaways = data.filter(giveaway => giveaway.title)
+          .map(giveaway => {
+            return {
+              ...giveaway,
+              formattedDate: moment(giveaway.event_date).format('DD.MM') // Форматируем дату
+            };
+          });
       } catch (error) {
         console.error("Ошибка загрузки данных", error);
       }
