@@ -23,6 +23,16 @@ export default (axios) => {
       return axios.get("http://localhost:3001/api/user/profile", {
         params: { telegramId }
       });
+    },
+    checkReward: (telegramId, giveawayId) => {
+      return axios.get("http://localhost:3001/api/check-reward", {
+        params: { telegramId, giveawayId }
+      });
+    },
+    giveReward: (telegramId, giveawayId, prize) => {
+      return axios.post("http://localhost:3001/api/give-reward", {
+        telegramId, giveawayId, prize
+      });
     }
   }
 }

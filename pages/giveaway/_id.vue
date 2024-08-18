@@ -157,7 +157,20 @@ export default {
         });
 
         if (this.allSubscribed) {
-          this.rewardMessage = `Выдана награда ${this.giveaway.prize} монет`;
+          const rewardCheck = await this.$axios.get(`/api/check-reward`, {
+            params: {telegramId, giveawayId: this.giveaway._id}
+          });
+
+          if (!rewardCheck.data.rewardReceived) {
+            await this.$axios.post(`/api/give-reward`, {
+              telegramId,
+              giveawayId: this.giveaway._id,
+              prize: this.giveaway.price
+            });
+            this.rewardMessage = `Выдана награда ${this.giveaway.price} монет`;
+          } else {
+            this.rewardMessage = `Награда уже была выдана ранее`;
+          }
         }
       } catch (error) {
         console.error('Ошибка проверки подписок', error);
