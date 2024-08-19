@@ -106,32 +106,94 @@ export default {
       }
     },
 
+
+    async checkSubscription(channel) {
+      try {
+        const telegramId = this.telegram.initDataUnsafe.user.id;
+        console.log(`Проверка подписки на канал: ${channel.id} пользователем: ${telegramId}`);
+
+        // Вызов API Telegram для получения статуса пользователя в чате
+        const response = await this.$axios.post(`/api/check-subscription`, {
+          telegramId,
+          channelId: channel.id
+        });
+
+        const isSubscribed = response.data.isMember;
+        console.log(`Результат проверки подписки на канал ${channel.id}:`, isSubscribed);
+
+        if (isSubscribed) {
+          // Обновляем подписку на сервере
+          const subscribeResponse = await this.$axios.post(`/api/subscribe`, {
+            telegramId,
+            channelId: channel.id,
+            giveawayId: this.giveaway._id
+          });
+          console.log(`Результат обновления подписки на сервере для канала ${channel.id}:`, subscribeResponse.data);
+
+          // Обновление UI после успешной подписки
+          this.$set(channel, 'subscribed', true);
+          this.snackbarMessage = subscribeResponse.data.message;
+          this.snackbarColor = 'green';
+
+          await this.checkAllSubscriptions();
+
+        } else {
+          // Если пользователь не подписан
+          this.snackbarMessage = 'Вы не подписаны на канал';
+          this.snackbarColor = 'red';
+        }
+
+        this.snackbar = true;
+
+        // Только после обновления вызовем проверку всех подписок
+        // await this.checkAllSubscriptions();
+
+      } catch (error) {
+        console.error('Ошибка проверки подписки', error);
+        this.snackbarMessage = 'Ошибка проверки подписки';
+        this.snackbarColor = 'red';
+        this.snackbar = true;
+      }
+    },
+
     async checkAllSubscriptions() {
       try {
         const telegramId = this.telegram.initDataUnsafe.user.id;
+        console.log(`Проверка всех подписок для пользователя: ${telegramId}`);
+
         const response = await this.$axios.get(`/api/get-subscriptions/${telegramId}`);
         const userSubscriptions = response.data.channels;
+        console.log('Текущие подписки пользователя:', userSubscriptions);
 
         this.allSubscribed = this.giveaway.channels.every(channel => {
           const subscription = userSubscriptions.find(sub => sub.id === channel.id);
+          console.log(`Подписка на канал ${channel.id}:`, subscription);
+
           if (subscription) {
             this.$set(channel, 'subscribed', subscription.subscribed);
           }
           return subscription && subscription.subscribed;
         });
+        console.log(`Результат проверки всех подписок: ${this.allSubscribed ? 'все подписаны' : 'не все подписаны'}`);
 
         if (this.allSubscribed) {
+          console.log(`Проверяем награду для пользователя: ${telegramId}`);
+
           const rewardCheck = await this.$axios.get(`/api/check-reward`, {
             params: {telegramId, giveawayId: this.giveaway._id}
           });
 
           if (!rewardCheck.data.rewardReceived) {
+            console.log("this.giveaway.price", this.giveaway.price);
+
             await this.$axios.post(`/api/give-reward`, {
               telegramId,
               giveawayId: this.giveaway._id,
               prize: this.giveaway.price
             });
             this.rewardMessage = `Выдана награда ${this.giveaway.price} монет`;
+            console.log(rewardResponse.data.message);
+
           } else {
             this.rewardMessage = `Награда уже была выдана ранее`;
           }
@@ -141,52 +203,6 @@ export default {
       }
     },
 
-    async checkSubscription(channel) {
-      try {
-        const telegramId = this.telegram.initDataUnsafe.user.id;
-
-        // Вызов API сервера для проверки подписки пользователя
-        const response = await this.$axios.post(`/api/check-subscription`, {
-          telegramId,
-          channelId: channel.id
-        });
-
-        // Логируем ответ от сервера
-        console.log('Response from check-subscription:', response.data);
-
-        // Получаем результат проверки подписки
-        const isMember = response.data.isMember;
-
-        if (isMember) {
-          // Логируем подтверждение подписки
-          console.log('User is subscribed to the channel.');
-
-          // Обновление данных в базе через сервер
-          await this.$axios.post(`/api/subscribe`, {
-            telegramId,
-            channelId: channel.id,
-            giveawayId: this.giveaway._id
-          });
-
-          this.snackbarMessage = 'Вы успешно подписаны на канал';
-          this.snackbarColor = 'green';
-          this.$set(channel, 'subscribed', true);
-          await this.checkAllSubscriptions();
-        } else {
-          // Логируем неподписку
-          console.log('User is NOT subscribed to the channel.');
-          this.snackbarMessage = 'Вы не подписаны на канал';
-          this.snackbarColor = 'red';
-        }
-
-        this.snackbar = true;
-      } catch (error) {
-        console.error('Ошибка проверки подписки', error);
-        this.snackbarMessage = 'Ошибка проверки подписки';
-        this.snackbarColor = 'red';
-        this.snackbar = true;
-      }
-    },
 
     openChannel(link) {
       window.open(link, '_blank');
