@@ -20,8 +20,8 @@
             </v-card-subtitle>
             <v-card-text class="text-center">
               <p><strong>Telegram ID:</strong> {{ userProfile.telegramId }}</p>
-              <p><strong>Баланс:</strong> {{ userProfile.balance }} ₽</p>
-              <p><strong>Замороженный баланс:</strong> {{ userProfile.frozenBalance }} ₽</p>
+              <p><strong>Баланс:</strong> {{ userProfile.balance }} ₿</p>
+              <p><strong>Замороженный баланс:</strong> {{ userProfile.frozenBalance }} ₿</p>
             </v-card-text>
           </v-col>
         </v-row>

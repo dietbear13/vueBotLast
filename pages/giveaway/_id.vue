@@ -58,6 +58,7 @@
 
 <script>
 import FooterMenu from '../../components/FooterMenu.vue';
+import api from "@/plugins/custom/api";
 
 export default {
   components: {
@@ -99,46 +100,9 @@ export default {
       try {
         const { data } = await this.$axios.get(`/api/giveaways/${this.$route.params.id}`);
         this.giveaway = data;
+        await this.checkAllSubscriptions(); // Перенос вызова сюда, чтобы проверить подписки после загрузки розыгрыша
       } catch (error) {
         console.error("Ошибка при загрузке данных розыгрыша:", error);
-      }
-    },
-
-    async checkSubscription(channel) {
-      try {
-        const telegramId = this.telegram.initDataUnsafe.user.id;
-
-        // Проверка подписки через сервер
-        const response = await this.$axios.post(`/api/check-subscription`, {
-          telegramId,
-          channelId: channel.id
-        });
-
-        const isSubscribed = response.data.isMember;
-
-        if (isSubscribed) {
-          // Обновление данных в базе через сервер
-          await this.$axios.post(`/api/subscribe`, {
-            telegramId,
-            channelId: channel.id,
-            giveawayId: this.giveaway._id
-          });
-
-          this.snackbarMessage = 'Вы успешно подписаны на канал';
-          this.snackbarColor = 'green';
-          this.$set(channel, 'subscribed', true);
-          await this.checkAllSubscriptions();
-        } else {
-          this.snackbarMessage = 'Вы не подписаны на канал';
-          this.snackbarColor = 'red';
-        }
-
-        this.snackbar = true;
-      } catch (error) {
-        console.error('Ошибка проверки подписки', error);
-        this.snackbarMessage = 'Ошибка проверки подписки';
-        this.snackbarColor = 'red';
-        this.snackbar = true;
       }
     },
 
@@ -174,6 +138,53 @@ export default {
         }
       } catch (error) {
         console.error('Ошибка проверки подписок', error);
+      }
+    },
+
+    async checkSubscription(channel) {
+      try {
+        const telegramId = this.telegram.initDataUnsafe.user.id;
+
+        // Вызов API сервера для проверки подписки пользователя
+        const response = await this.$axios.post(`/api/check-subscription`, {
+          telegramId,
+          channelId: channel.id
+        });
+
+        // Логируем ответ от сервера
+        console.log('Response from check-subscription:', response.data);
+
+        // Получаем результат проверки подписки
+        const isMember = response.data.isMember;
+
+        if (isMember) {
+          // Логируем подтверждение подписки
+          console.log('User is subscribed to the channel.');
+
+          // Обновление данных в базе через сервер
+          await this.$axios.post(`/api/subscribe`, {
+            telegramId,
+            channelId: channel.id,
+            giveawayId: this.giveaway._id
+          });
+
+          this.snackbarMessage = 'Вы успешно подписаны на канал';
+          this.snackbarColor = 'green';
+          this.$set(channel, 'subscribed', true);
+          await this.checkAllSubscriptions();
+        } else {
+          // Логируем неподписку
+          console.log('User is NOT subscribed to the channel.');
+          this.snackbarMessage = 'Вы не подписаны на канал';
+          this.snackbarColor = 'red';
+        }
+
+        this.snackbar = true;
+      } catch (error) {
+        console.error('Ошибка проверки подписки', error);
+        this.snackbarMessage = 'Ошибка проверки подписки';
+        this.snackbarColor = 'red';
+        this.snackbar = true;
       }
     },
 

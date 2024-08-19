@@ -84,9 +84,7 @@ import FooterMenu from '../components/FooterMenu.vue';
 import PageHeader from '../components/PageHeader.vue';
 import BettingItem from "../components/BettingItem.vue";
 import PredictionCalculator from '../components/PredictionCalculator.vue';
-// import createApi from '../api'; // Импорт фабричной функции API
 //
-// const api = createApi(axios); // Создаем экземпляр API-клиента
 
 export default {
   components: {
