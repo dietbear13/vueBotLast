@@ -47,6 +47,16 @@
       </v-list-item>
     </v-list>
 
+    <!-- Кнопка проверки награды -->
+    <v-btn
+      v-if="allSubscribed && !rewardGiven"
+      class="mt-4"
+      color="primary"
+      @click="checkReward"
+    >
+      Проверить награду
+    </v-btn>
+
     <!-- Уведомление (Snackbar) -->
     <v-snackbar v-model="snackbar" :timeout="2000" top right :color="snackbarColor">
       {{ snackbarMessage }}
@@ -68,6 +78,7 @@ export default {
     return {
       giveaway: null,
       rewardMessage: '',
+      rewardGiven: false, // Новый флаг для отслеживания, была ли выдана награда
       allSubscribed: false,  // Флаг для отслеживания подписки на все каналы
       snackbar: false,
       snackbarMessage: '',
@@ -96,6 +107,43 @@ export default {
   },
 
   methods: {
+    async checkReward() {
+      try {
+        const telegramId = this.telegram.initDataUnsafe.user.id;
+        console.log(`Проверка награды для пользователя: ${telegramId}`);
+
+        const rewardCheck = await this.$axios.get(`/api/check-reward`, {
+          params: { telegramId, giveawayId: this.giveaway._id }
+        });
+
+        if (!rewardCheck.data.rewardReceived) {
+          console.log("Начисление награды:", this.giveaway.price);
+
+          await this.$axios.post(`/api/give-reward`, {
+            telegramId,
+            giveawayId: this.giveaway._id,
+            prize: this.giveaway.price
+          });
+          this.rewardMessage = `Выдана награда ${this.giveaway.price} монет`;
+          this.rewardGiven = true; // Устанавливаем флаг, что награда была выдана
+          this.snackbarMessage = 'Награда успешно выдана';
+          this.snackbarColor = 'green';
+        } else {
+          this.rewardMessage = `Награда уже была выдана ранее`;
+          this.snackbarMessage = 'Награда уже была выдана ранее';
+          this.snackbarColor = 'blue';
+        }
+
+        this.snackbar = true;
+
+      } catch (error) {
+        console.error('Ошибка при проверке награды', error);
+        this.snackbarMessage = 'Ошибка при проверке награды';
+        this.snackbarColor = 'red';
+        this.snackbar = true;
+      }
+    },
+
     async loadGiveawayData() {
       try {
         const { data } = await this.$axios.get(`/api/giveaways/${this.$route.params.id}`);
@@ -105,7 +153,6 @@ export default {
         console.error("Ошибка при загрузке данных розыгрыша:", error);
       }
     },
-
 
     async checkSubscription(channel) {
       try {
@@ -145,9 +192,6 @@ export default {
 
         this.snackbar = true;
 
-        // Только после обновления вызовем проверку всех подписок
-        // await this.checkAllSubscriptions();
-
       } catch (error) {
         console.error('Ошибка проверки подписки', error);
         this.snackbarMessage = 'Ошибка проверки подписки';
@@ -166,7 +210,8 @@ export default {
         console.log('Текущие подписки пользователя:', userSubscriptions);
 
         this.allSubscribed = this.giveaway.channels.every(channel => {
-          const subscription = userSubscriptions.find(sub => sub.id === channel.id);
+          const subscription = userSubscriptions.find(sub => sub.channelId === channel.id); // проверка по channelId
+
           console.log(`Подписка на канал ${channel.id}:`, subscription);
 
           if (subscription) {
@@ -174,27 +219,17 @@ export default {
           }
           return subscription && subscription.subscribed;
         });
+
         console.log(`Результат проверки всех подписок: ${this.allSubscribed ? 'все подписаны' : 'не все подписаны'}`);
 
+        // Проверка награды после подтверждения всех подписок
         if (this.allSubscribed) {
-          console.log(`Проверяем награду для пользователя: ${telegramId}`);
-
           const rewardCheck = await this.$axios.get(`/api/check-reward`, {
-            params: {telegramId, giveawayId: this.giveaway._id}
+            params: { telegramId, giveawayId: this.giveaway._id }
           });
+          this.rewardGiven = rewardCheck.data.rewardReceived;
 
-          if (!rewardCheck.data.rewardReceived) {
-            console.log("this.giveaway.price", this.giveaway.price);
-
-            await this.$axios.post(`/api/give-reward`, {
-              telegramId,
-              giveawayId: this.giveaway._id,
-              prize: this.giveaway.price
-            });
-            this.rewardMessage = `Выдана награда ${this.giveaway.price} монет`;
-            console.log(rewardResponse.data.message);
-
-          } else {
+          if (this.rewardGiven) {
             this.rewardMessage = `Награда уже была выдана ранее`;
           }
         }
@@ -202,7 +237,6 @@ export default {
         console.error('Ошибка проверки подписок', error);
       }
     },
-
 
     openChannel(link) {
       window.open(link, '_blank');
